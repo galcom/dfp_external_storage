@@ -24,6 +24,7 @@
   "presigned_urls",
   "presigned_url_expiration",
   "presigned_mimetypes_starting",
+  "doctypes_ignored",
   "column_break_clee",
   "remote_size_enabled",
   "html_mtku",
@@ -70,7 +71,7 @@
    "reqd": 1
   },
   {
-   "description": "Be careful! I recommend you to set up your bucket as private in your provider and/or remove public access to objects. Some files you upload to Frappe",
+   "description": "<strong>Be careful!</strong> Please set up your bucket as private in your provider and/or remove public access to objects. <strong>Some files you upload to Frappe will be for sure private!</strong>",
    "documentation_url": "https://min.io/docs/minio/linux/developers/python/API.html",
    "fieldname": "bucket_name",
    "fieldtype": "Data",
@@ -88,6 +89,7 @@
    "options": "<p>Used Minio library (Simple Storage Service or S3) client to perform bucket and object operations), so please refer to it class initialization for more info:</p>\n<ul>\n<li><strong>endpoint</strong>: Hostname of a S3 service.</li>\n<li><strong>access_key</strong>: Access key (aka user ID) of your account in S3 service.</li>\n<li><strong>secret_key</strong>: Secret Key (aka password) of your account in S3 service.</li>\n<li><strong>session_token</strong>: Session token of your account in S3 service.</li>\n<li><strong>secure</strong>: Flag to indicate to use secure (TLS) connection to S3 service or not.</li>\n</ul>"
   },
   {
+   "description": "Only host and port. For example:\n<ul><li>[id].r2.cloudflarestorage.com:443</li><li>minio:9000</li><li>...</li></ul>\nRead <a href=\"https://min.io/docs/minio/linux/developers/python/API.html\" target=\"_blank\">Minio documentation</a> for more info.",
    "documentation_url": "https://min.io/docs/minio/linux/developers/python/API.html",
    "fieldname": "endpoint",
    "fieldtype": "Data",
@@ -109,7 +111,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "Select one or more folders. Select \"Home\" folder for ALL files within Frappe being synced with this remote file connection.",
+   "description": "Select one or more specific folders. Select \"<strong>Home</strong>\" and ALL files will be uploaded to this remote (If done, you should add some ignored Doctypes, like mentioned within \"Doctypes ignored for file attachments\" below advanced settings).",
    "fieldname": "folders",
    "fieldtype": "Table MultiSelect",
    "label": "Folder(s)",
@@ -118,7 +120,7 @@
   },
   {
    "default": "0",
-   "description": "<ul>\n<li><strong>enabled</strong>: all files will be uploaded within selected folder(s) will be uploaded to remote storage.</li>\n<li><strong>disabled</strong>: If connection is valid will be used to get/download remote files but no new files will be uploaded.</li>\n</ul>\n",
+   "description": "<ul>\n<li><strong>enabled</strong>: File will be uploaded to specified bucket when:\n<ul><li>\"Folder\" defined below and \"File\" is located inside it.</li><li>\"File\" is edited and this external storage is selected.</li></ul> </li>\n<li><strong>disabled</strong>: If connection is valid, remote files will be used for viewing and downloading tasks, but no files will be uploaded to remote bucket.</li>\n</ul>\n",
    "fieldname": "enabled",
    "fieldtype": "Check",
    "label": "Write enabled"
@@ -136,7 +138,7 @@
    "fieldtype": "Int",
    "hidden": 1,
    "is_virtual": 1,
-   "label": "Files in bucket / Same as File(s) in top \"Connections\" area",
+   "label": "Files inside the bucket / Same as File(s) in top \"Connections\" area",
    "non_negative": 1
   },
   {
@@ -156,7 +158,7 @@
   {
    "default": "video/",
    "depends_on": "eval:doc.presigned_urls",
-   "description": "For example, use `videos/` to enable only for all videos.",
+   "description": "For example, use `videos/` and all videos will be enabled.",
    "fieldname": "presigned_mimetypes_starting",
    "fieldtype": "Small Text",
    "label": "Use presigned urls only for mime types starting with: (one per line)"
@@ -203,10 +205,17 @@
   },
   {
    "default": "0",
-   "description": "Frappe DocType File size is limited to INT(11) in database, so if you need to store files bigger than 2GB check this setting and for download/stream file remote size will be used. Default: 0 (unchecked)",
+   "description": "Frappe DocType File size is limited to INT(11) in database, so if you need to store files bigger than 2GB check this setting and remote file size will be used for download/stream. Default: 0 (unchecked)",
    "fieldname": "remote_size_enabled",
    "fieldtype": "Check",
    "label": "Use S3 file size"
+  },
+  {
+   "description": "DocTypes included here will not use this bucket for file storage, so default functionality will be used. Make sense for some doctypes like: \"Repost Item Valuation\", \"Data Import\", \"Prepared Report\", etc. (If you add/remove doctypes here, existent \"File\"s will not be affected unless you update them)",
+   "fieldname": "doctypes_ignored",
+   "fieldtype": "Table MultiSelect",
+   "label": "Doctypes ignored for file attachments",
+   "options": "DFP External Storage Ignored Doctype"
   }
  ],
  "links": [
@@ -216,7 +225,7 @@
    "link_fieldname": "dfp_external_storage"
   }
  ],
- "modified": "2024-03-02 12:49:25.473647",
+ "modified": "2024-05-08 12:30:59.417145",
  "modified_by": "Administrator",
  "module": "DFP External Storage",
  "name": "DFP External Storage",
