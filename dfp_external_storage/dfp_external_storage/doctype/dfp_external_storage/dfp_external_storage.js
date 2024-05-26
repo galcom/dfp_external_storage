@@ -6,6 +6,12 @@ frappe.ui.form.on('DFP External Storage', {
 	},
 
 	refresh: function(frm) {
+		if (frm.is_new() && !frm.doc.doctypes_ignored.length) {
+			frm.doc.doctypes_ignored.push({doctype_to_ignore: 'Data Import'})
+			frm.doc.doctypes_ignored.push({doctype_to_ignore: 'Prepared Report'})
+			frm.refresh_field('doctypes_ignored')
+		}
+
 		if (frm.doc.enabled) {
 			frm.button_remote_files_list = frm.add_custom_button(
 				__('List files in bucket'),
