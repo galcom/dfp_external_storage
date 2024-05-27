@@ -352,7 +352,7 @@ class DFPExternalStorageFile(File):
 
 	def dfp_external_storage_ignored_doctypes(self):
 		"Do not apply for files attached to specified doctypes"
-		if self.attached_to_doctype and self.attached_to_doctype in [i.doctype_to_ignore for i in self.dfp_external_storage_doc.doctypes_ignored]:
+		if self.attached_to_doctype and self.dfp_external_storage_doc and self.attached_to_doctype in [i.doctype_to_ignore for i in self.dfp_external_storage_doc.doctypes_ignored]:
 			frappe.msgprint(_("""This doctype does not allow remote files attached to it. Check "DFP External Storage" advanced settings for more details."""))
 			return True
 
