@@ -89,7 +89,7 @@
    "options": "<p>Used Minio library (Simple Storage Service or S3) client to perform bucket and object operations), so please refer to it class initialization for more info:</p>\n<ul>\n<li><strong>endpoint</strong>: Hostname of a S3 service.</li>\n<li><strong>access_key</strong>: Access key (aka user ID) of your account in S3 service.</li>\n<li><strong>secret_key</strong>: Secret Key (aka password) of your account in S3 service.</li>\n<li><strong>session_token</strong>: Session token of your account in S3 service.</li>\n<li><strong>secure</strong>: Flag to indicate to use secure (TLS) connection to S3 service or not.</li>\n</ul>"
   },
   {
-   "description": "Only host and port. For example:\n<ul><li>[id].r2.cloudflarestorage.com:443</li><li>minio:9000</li><li>...</li></ul>\nRead <a href=\"https://min.io/docs/minio/linux/developers/python/API.html\" target=\"_blank\">Minio documentation</a> for more info.",
+   "description": "Only host and port. For example:\n<ul><li>[id].r2.cloudflarestorage.com:443</li><li>s3.amazonaws.com</li><li>minio:9000</li><li>...</li></ul>\nRead <a href=\"https://min.io/docs/minio/linux/developers/python/API.html\" target=\"_blank\">Minio documentation</a> for more info.",
    "documentation_url": "https://min.io/docs/minio/linux/developers/python/API.html",
    "fieldname": "endpoint",
    "fieldtype": "Data",
@@ -100,7 +100,7 @@
   },
   {
    "default": "0",
-   "description": "Flag to indicate to use secure (TLS) connection to S3 service or not.",
+   "description": "Should be checked for production environments. Will use secure (TLS) connection when connecting to S3 server defined in \"host:port\".",
    "documentation_url": "https://min.io/docs/minio/linux/developers/python/API.html",
    "fieldname": "secure",
    "fieldtype": "Check",
@@ -225,7 +225,7 @@
    "link_fieldname": "dfp_external_storage"
   }
  ],
- "modified": "2024-05-08 12:30:59.417145",
+ "modified": "2024-05-29 09:57:12.889797",
  "modified_by": "Administrator",
  "module": "DFP External Storage",
  "name": "DFP External Storage",
