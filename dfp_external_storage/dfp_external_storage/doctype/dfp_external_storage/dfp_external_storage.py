@@ -330,6 +330,9 @@ class DFPExternalStorageFile(File):
 		if self.dfp_external_storage_s3_key and self.dfp_external_storage_doc:
 			return True
 
+	def will_be_remote(self):
+		return self.dfp_external_storage_doc != None
+
 	def dfp_is_cacheable(self):
 		return not self.is_private and self.dfp_external_storage_doc.setting_cache_files_smaller_than and self.dfp_file_size != 0 and self.dfp_file_size < self.dfp_external_storage_doc.setting_cache_files_smaller_than
 
@@ -377,6 +380,9 @@ class DFPExternalStorageFile(File):
 
 		original_file_url = self.file_url
 
+		if not self.name:
+			self.save()
+
 		# Define S3 key
 		# key = f"{frappe.local.site}/{self.file_name}" # << Before 2024.03.03
 		base, extension = os.path.splitext(self.file_name)
@@ -384,6 +390,8 @@ class DFPExternalStorageFile(File):
 
 		is_public = "/public" if not self.is_private else ""
 		if not local_file:
+			if not self.file_url:
+				frappe.throw("dfp_external_storage_upload_file: cannot upload file, file_url is not set and local_file not given")
 			local_file = "./" + frappe.local.site + is_public + self.file_url
 
 		try:
@@ -402,6 +410,7 @@ class DFPExternalStorageFile(File):
 			self.dfp_external_storage_s3_key = key
 			self.dfp_external_storage = self.dfp_external_storage_doc.name
 			self.file_url = f"/{DFP_EXTERNAL_STORAGE_URL_SEGMENT_FOR_FILE_LOAD}/{self.name}/{self.file_name}"
+
 			os.remove(local_file)
 		except Exception as e:
 			error_msg = _("Error saving file in remote folder: {}").format(str(e))
@@ -521,7 +530,10 @@ class DFPExternalStorageFile(File):
 			frappe.throw(error_msg)
 
 	def validate_file_on_disk(self):
-		return True if self.dfp_is_s3_remote_file() else super(DFPExternalStorageFile, self).validate_file_on_disk()
+		if self.dfp_is_s3_remote_file() or self.will_be_remote():
+			return True
+
+		super(DFPExternalStorageFile, self).validate_file_on_disk()
 
 	def exists_on_disk(self):
 		return False if self.dfp_is_s3_remote_file() else super(DFPExternalStorageFile, self).exists_on_disk()
@@ -576,7 +588,7 @@ class DFPExternalStorageFile(File):
 			return content_type
 
 	def dfp_presigned_url_get(self):
-		if not self.dfp_is_s3_remote_file() or not self.dfp_external_storage_doc.presigned_urls:
+		if not self.dfp_is_s4_remote_file() or not self.dfp_external_storage_doc.presigned_urls:
 			return
 		if self.dfp_external_storage_doc.presigned_mimetypes_starting and self.dfp_mime_type_guess_by_file_name:
 			# get list exploding by new line, removing empty lines and cleaning starting and ending spaces
@@ -594,8 +606,12 @@ def hook_file_before_save(doc, method):
 	previous = doc.get_doc_before_save()
 
 	if not previous:
-		# NEW "File": Case 1: remote selected => upload to remote and continue "File" flow
-		doc.dfp_external_storage_upload_file()
+
+		# NEW "File": Case 1a: remote selected and have file => upload to remote and continue "File" flow
+		if doc.file_url:
+			doc.dfp_external_storage_upload_file()
+
+		# NEW "File": Case 1b: remote selected and no local file (file_url) to upload => do nothing for now
 		return
 
 	# MODIFY "File"
