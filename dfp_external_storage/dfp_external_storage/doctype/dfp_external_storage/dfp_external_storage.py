@@ -530,6 +530,7 @@ class DFPExternalStorageFile(File):
 			frappe.throw(error_msg)
 
 	def validate_file_on_disk(self):
+		print(f"VALIDATE FILE ON DISK. is remote? {self.dfp_is_s3_remote_file()}, will be remote? {self.will_be_remote()}")
 		if self.dfp_is_s3_remote_file() or self.will_be_remote():
 			return True
 
