@@ -530,7 +530,6 @@ class DFPExternalStorageFile(File):
 			frappe.throw(error_msg)
 
 	def validate_file_on_disk(self):
-		print(f"VALIDATE FILE ON DISK. is remote? {self.dfp_is_s3_remote_file()}, will be remote? {self.will_be_remote()}")
 		if self.dfp_is_s3_remote_file() or self.will_be_remote():
 			return True
 
@@ -734,6 +733,7 @@ def file(name:str, file:str):
 		except frappe.Redirect:
 			raise
 		except:
+			frappe.logger().exception(f"Error obtaining remote file content: {name}/{file}")
 			frappe.log_error(f"Error obtaining remote file content: {name}/{file}")
 
 		if "response" not in response_values or not response_values["response"]:
