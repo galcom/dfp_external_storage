@@ -588,7 +588,7 @@ class DFPExternalStorageFile(File):
 			return content_type
 
 	def dfp_presigned_url_get(self):
-		if not self.dfp_is_s4_remote_file() or not self.dfp_external_storage_doc.presigned_urls:
+		if not self.dfp_is_s3_remote_file() or not self.dfp_external_storage_doc.presigned_urls:
 			return
 		if self.dfp_external_storage_doc.presigned_mimetypes_starting and self.dfp_mime_type_guess_by_file_name:
 			# get list exploding by new line, removing empty lines and cleaning starting and ending spaces
@@ -733,6 +733,7 @@ def file(name:str, file:str):
 		except frappe.Redirect:
 			raise
 		except:
+            frappe.logger().exception(f"Error obtaining remote file content: {name}/{file}")
 			frappe.log_error(f"Error obtaining remote file content: {name}/{file}")
 
 		if "response" not in response_values or not response_values["response"]:
