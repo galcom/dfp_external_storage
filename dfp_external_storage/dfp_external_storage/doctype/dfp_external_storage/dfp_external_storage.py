@@ -733,7 +733,7 @@ def file(name:str, file:str):
 		except frappe.Redirect:
 			raise
 		except:
-            frappe.logger().exception(f"Error obtaining remote file content: {name}/{file}")
+			frappe.logger().exception(f"Error obtaining remote file content: {name}/{file}")
 			frappe.log_error(f"Error obtaining remote file content: {name}/{file}")
 
 		if "response" not in response_values or not response_values["response"]:
