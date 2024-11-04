@@ -701,7 +701,10 @@ class DFPExternalStorageFileRenderer:
 
 
 def file(name:str, file:str):
+	print(f"downloading name: {name}, file: {file}")
+
 	if not name or not file:
+		frappe.log_error("Page not found",f"name ({name}) or file ({file}) not given")
 		raise frappe.PageDoesNotExistError()
 
 	cache_key = f"{DFP_EXTERNAL_STORAGE_PUBLIC_CACHE_PREFIX}{name}"
@@ -714,6 +717,8 @@ def file(name:str, file:str):
 				raise Exception("File not available")
 		except Exception:
 			# If no document, no read permissions, etc. For security reasons do not give any information, so just raise a 404 error
+			frappe.logger().exception(f"Page not found, either no File found {doc}, could not be downloaded, or file_name {doc and doc.file_name} does equal given name {file}")
+			frappe.log_error("Page not found",f"either no File found {doc}, could not be downloaded, or file_name {doc and doc.file_name} does equal given name {file}")
 			raise frappe.PageDoesNotExistError()
 
 		response_values = {}
@@ -737,6 +742,7 @@ def file(name:str, file:str):
 			frappe.log_error(f"Error obtaining remote file content: {name}/{file}")
 
 		if "response" not in response_values or not response_values["response"]:
+			frappe.log_error("Page not found",f"no reponse defined. response_values: {response_values}")
 			raise frappe.PageDoesNotExistError()
 
 		if doc.dfp_mime_type_guess_by_file_name:
@@ -751,4 +757,5 @@ def file(name:str, file:str):
 	if "status" in response_values and response_values["status"] == 200:
 		return Response(**response_values)
 
+	frappe.log_error("Page not found",f"unknown reason. response so far: {response_values}")
 	raise frappe.PageDoesNotExistError()
